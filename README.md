@@ -12,7 +12,9 @@
 [types-badge]: https://badgen.net/npm/types/@clebert/node-switch-bot
 [types-link]: https://github.com/clebert/node-switch-bot
 
-> A Node.js API for SwitchBot with native TypeScript support.
+> A Node.js API for
+> [SwitchBot](https://www.switch-bot.com/products/switchbot-bot) with native
+> TypeScript support.
 
 This package runs only on Linux and uses BlueZ and D-Bus under the hood.
 
