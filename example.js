@@ -1,7 +1,8 @@
 // @ts-check
 
+const {Adapter} = require('@clebert/node-bluez');
 const {SystemDBus} = require('@clebert/node-d-bus');
-const {Bot} = require('./lib/cjs');
+const {SwitchBot} = require('./lib/cjs');
 
 (async () => {
   const dBus = new SystemDBus();
@@ -11,20 +12,32 @@ const {Bot} = require('./lib/cjs');
   try {
     await dBus.hello();
 
-    const bot = new Bot(dBus, 'XX:XX:XX:XX:XX:XX', {operationTimeout: 5000});
-    const properties = await bot.getProperties();
+    const [adapter] = await Adapter.getAll(dBus);
 
-    console.log('Mode:', properties.mode);
-
-    if (properties.mode === 'switch') {
-      console.log('State:', properties.state);
+    if (!adapter) {
+      throw new Error('Adapter not found.');
     }
 
-    console.log('Battery level:', properties.batteryLevel);
+    const switchBot = new SwitchBot(adapter, 'XX:XX:XX:XX:XX:XX');
+    const unlockAdapter = await adapter.lock.aquire();
 
-    await bot.press(); // mode: 'press'
-    await bot.switch('on'); // mode: 'switch', state: 'on'
-    await bot.switch('off'); // mode: 'switch', state: 'off'
+    try {
+      const properties = await switchBot.getProperties();
+
+      console.log('Mode:', properties.mode);
+
+      if (properties.mode === 'switch') {
+        console.log('State:', properties.state);
+      }
+
+      console.log('Battery level:', properties.batteryLevel);
+
+      await switchBot.press(); // mode: 'press'
+      await switchBot.switch('on'); // mode: 'switch', state: 'on'
+      await switchBot.switch('off'); // mode: 'switch', state: 'off'
+    } finally {
+      unlockAdapter();
+    }
   } finally {
     dBus.disconnect();
   }

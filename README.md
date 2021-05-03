@@ -21,7 +21,7 @@ This package runs only on Linux and uses BlueZ and D-Bus under the hood.
 ## Installation
 
 ```
-npm install @clebert/node-switch-bot
+npm install @clebert/node-switch-bot @clebert/node-bluez @clebert/node-d-bus
 ```
 
 ## Features
@@ -35,8 +35,9 @@ npm install @clebert/node-switch-bot
 ## Usage example
 
 ```js
+import {Adapter} from '@clebert/node-bluez';
 import {SystemDBus} from '@clebert/node-d-bus';
-import {Bot} from '@clebert/node-switch-bot';
+import {SwitchBot} from '@clebert/node-switch-bot';
 
 (async () => {
   const dBus = new SystemDBus();
@@ -46,20 +47,32 @@ import {Bot} from '@clebert/node-switch-bot';
   try {
     await dBus.hello();
 
-    const bot = new Bot(dBus, 'XX:XX:XX:XX:XX:XX', {operationTimeout: 5000});
-    const properties = await bot.getProperties();
+    const [adapter] = await Adapter.getAll(dBus);
 
-    console.log('Mode:', properties.mode);
-
-    if (properties.mode === 'switch') {
-      console.log('State:', properties.state);
+    if (!adapter) {
+      throw new Error('Adapter not found.');
     }
 
-    console.log('Battery level:', properties.batteryLevel);
+    const switchBot = new SwitchBot(adapter, 'XX:XX:XX:XX:XX:XX');
+    const unlockAdapter = await adapter.lock.aquire();
 
-    await bot.press(); // mode: 'press'
-    await bot.switch('on'); // mode: 'switch', state: 'on'
-    await bot.switch('off'); // mode: 'switch', state: 'off'
+    try {
+      const properties = await switchBot.getProperties();
+
+      console.log('Mode:', properties.mode);
+
+      if (properties.mode === 'switch') {
+        console.log('State:', properties.state);
+      }
+
+      console.log('Battery level:', properties.batteryLevel);
+
+      await switchBot.press(); // mode: 'press'
+      await switchBot.switch('on'); // mode: 'switch', state: 'on'
+      await switchBot.switch('off'); // mode: 'switch', state: 'off'
+    } finally {
+      unlockAdapter();
+    }
   } finally {
     dBus.disconnect();
   }
