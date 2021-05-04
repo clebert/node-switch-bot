@@ -30,7 +30,7 @@ const {SwitchBot} = require('./lib/cjs');
         console.log('State:', properties.state);
       }
 
-      console.log('Battery level:', properties.batteryLevel);
+      console.log('Battery level (%):', properties.batteryLevel);
 
       await switchBot.press(); // mode: 'press'
       await switchBot.switch('on'); // mode: 'switch', state: 'on'

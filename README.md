@@ -12,7 +12,7 @@
 [types-badge]: https://badgen.net/npm/types/@clebert/node-switch-bot
 [types-link]: https://github.com/clebert/node-switch-bot
 
-> A Node.js API for
+> A Node.js API for the
 > [SwitchBot](https://www.switch-bot.com/products/switchbot-bot) with native
 > TypeScript support.
 
@@ -65,7 +65,7 @@ import {SwitchBot} from '@clebert/node-switch-bot';
         console.log('State:', properties.state);
       }
 
-      console.log('Battery level:', properties.batteryLevel);
+      console.log('Battery level (%):', properties.batteryLevel);
 
       await switchBot.press(); // mode: 'press'
       await switchBot.switch('on'); // mode: 'switch', state: 'on'
