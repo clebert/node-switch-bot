@@ -1,6 +1,6 @@
 {
   "name": "@clebert/node-switch-bot",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A Node.js API for the SwitchBot with native TypeScript support.",
   "bugs": {
     "url": "https://github.com/clebert/node-switch-bot/issues"
