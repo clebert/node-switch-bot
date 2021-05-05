@@ -36,47 +36,24 @@ npm install @clebert/node-switch-bot @clebert/node-bluez @clebert/node-d-bus
 
 ```js
 import {Adapter} from '@clebert/node-bluez';
-import {SystemDBus} from '@clebert/node-d-bus';
 import {SwitchBot} from '@clebert/node-switch-bot';
 
-(async () => {
-  const dBus = new SystemDBus();
+Adapter.use(async (adapter) => {
+  const switchBot = new SwitchBot(adapter, 'XX:XX:XX:XX:XX:XX');
+  const properties = await switchBot.getProperties();
 
-  await dBus.connectAsExternal();
+  console.log('Mode:', properties.mode);
 
-  try {
-    await dBus.hello();
-
-    const [adapter] = await Adapter.getAll(dBus);
-
-    if (!adapter) {
-      throw new Error('Adapter not found.');
-    }
-
-    const switchBot = new SwitchBot(adapter, 'XX:XX:XX:XX:XX:XX');
-    const unlockAdapter = await adapter.lock.aquire();
-
-    try {
-      const properties = await switchBot.getProperties();
-
-      console.log('Mode:', properties.mode);
-
-      if (properties.mode === 'switch') {
-        console.log('State:', properties.state);
-      }
-
-      console.log('Battery level (%):', properties.batteryLevel);
-
-      await switchBot.press(); // mode: 'press'
-      await switchBot.switch('on'); // mode: 'switch', state: 'on'
-      await switchBot.switch('off'); // mode: 'switch', state: 'off'
-    } finally {
-      unlockAdapter();
-    }
-  } finally {
-    dBus.disconnect();
+  if (properties.mode === 'switch') {
+    console.log('State:', properties.state);
   }
-})().catch((error) => {
+
+  console.log('Battery level (%):', properties.batteryLevel);
+
+  await switchBot.press(); // mode: 'press'
+  await switchBot.switch('on'); // mode: 'switch', state: 'on'
+  await switchBot.switch('off'); // mode: 'switch', state: 'off'
+}).catch((error) => {
   console.error(error);
   process.exit(1);
 });

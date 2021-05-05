@@ -78,6 +78,11 @@ export class SwitchBot {
   readonly #findDevice = async (): Promise<Device> => {
     await this.#adapter.setPowered(true);
 
+    await this.#adapter.setDiscoveryFilter({
+      serviceUUIDs: ['cba20d00-224d-11e6-9fb8-0002a5d5c51b'],
+      transport: 'le',
+    });
+
     const [device] = await this.#adapter.getDevices(this.#deviceAddress);
 
     if (device) {
