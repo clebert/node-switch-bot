@@ -1,17 +1,5 @@
 # Node.js SwitchBot
 
-[![][ci-badge]][ci-link] [![][version-badge]][version-link]
-[![][license-badge]][license-link] [![][types-badge]][types-link]
-
-[ci-badge]: https://github.com/clebert/node-switch-bot/workflows/CI/badge.svg
-[ci-link]: https://github.com/clebert/node-switch-bot
-[version-badge]: https://badgen.net/npm/v/@clebert/node-switch-bot
-[version-link]: https://www.npmjs.com/package/@clebert/node-switch-bot
-[license-badge]: https://badgen.net/npm/license/@clebert/node-switch-bot
-[license-link]: https://github.com/clebert/node-switch-bot/blob/master/LICENSE
-[types-badge]: https://badgen.net/npm/types/@clebert/node-switch-bot
-[types-link]: https://github.com/clebert/node-switch-bot
-
 > A Node.js API for the
 > [SwitchBot](https://www.switch-bot.com/products/switchbot-bot) with native
 > TypeScript support.
@@ -38,24 +26,21 @@ npm install @clebert/node-switch-bot @clebert/node-bluez @clebert/node-d-bus
 import {Adapter} from '@clebert/node-bluez';
 import {SwitchBot} from '@clebert/node-switch-bot';
 
-Adapter.use(async (adapter) => {
-  const switchBot = new SwitchBot(adapter, 'XX:XX:XX:XX:XX:XX');
+await Adapter.use(async (adapter) => {
+  const switchBot = new SwitchBot(adapter, `XX:XX:XX:XX:XX:XX`);
   const properties = await switchBot.getProperties();
 
-  console.log('Mode:', properties.mode);
+  console.log(`Mode:`, properties.mode);
 
-  if (properties.mode === 'switch') {
-    console.log('State:', properties.state);
+  if (properties.mode === `switch`) {
+    console.log(`State:`, properties.state);
   }
 
-  console.log('Battery level (%):', properties.batteryLevel);
+  console.log(`Battery level (%):`, properties.batteryLevel);
 
   await switchBot.press(); // mode: 'press'
-  await switchBot.switch('on'); // mode: 'switch', state: 'on'
-  await switchBot.switch('off'); // mode: 'switch', state: 'off'
-}).catch((error) => {
-  console.error(error);
-  process.exit(1);
+  await switchBot.switch(`on`); // mode: 'switch', state: 'on'
+  await switchBot.switch(`off`); // mode: 'switch', state: 'off'
 });
 ```
 
@@ -79,8 +64,3 @@ username may need to be modified.
   </policy>
 </busconfig>
 ```
-
----
-
-Copyright (c) 2021, Clemens Akens. Released under the terms of the
-[MIT License](https://github.com/clebert/node-switch-bot/blob/master/LICENSE).

@@ -1,4 +1,4 @@
-import {Adapter, Device} from '@clebert/node-bluez';
+import type {Adapter, Device} from '@clebert/node-bluez';
 
 export interface SwitchBotOptions {
   /** Default: `50` milliseconds (ms) */
@@ -28,7 +28,7 @@ export class SwitchBot {
   constructor(
     adapter: Adapter,
     deviceAddress: string,
-    options: SwitchBotOptions = {}
+    options: SwitchBotOptions = {},
   ) {
     this.#adapter = adapter;
     this.#deviceAddress = deviceAddress;
@@ -37,7 +37,7 @@ export class SwitchBot {
 
   async getProperties(device?: Device): Promise<SwitchBotProperties> {
     const serviceData = await this.#getServiceData(
-      device ?? (await this.#findDevice())
+      device ?? (await this.#findDevice()),
     );
 
     const mode = Boolean((serviceData[1] ?? 0) & 0b10000000);
@@ -45,15 +45,15 @@ export class SwitchBot {
     const batteryLevel = (serviceData[2] ?? 0) & 0b01111111;
 
     return mode
-      ? {mode: 'switch', state: state ? 'off' : 'on', batteryLevel}
-      : {mode: 'press', batteryLevel};
+      ? {mode: `switch`, state: state ? `off` : `on`, batteryLevel}
+      : {mode: `press`, batteryLevel};
   }
 
   async press(): Promise<void> {
     const device = await this.#findDevice();
     const properties = await this.getProperties(device);
 
-    if (properties.mode === 'switch') {
+    if (properties.mode === `switch`) {
       await this.#sendCommand(device, [0x57, 0x03, 0x64, 0x00]);
     } else {
       await this.#sendCommand(device, [0x57, 0x01, 0x00]);
@@ -64,11 +64,11 @@ export class SwitchBot {
     const device = await this.#findDevice();
     const properties = await this.getProperties(device);
 
-    if (properties.mode === 'press') {
+    if (properties.mode === `press`) {
       await this.#sendCommand(device, [0x57, 0x03, 0x64, 0x10]);
     }
 
-    if (state === 'on') {
+    if (state === `on`) {
       await this.#sendCommand(device, [0x57, 0x01, 0x01]);
     } else {
       await this.#sendCommand(device, [0x57, 0x01, 0x02]);
@@ -79,8 +79,8 @@ export class SwitchBot {
     await this.#adapter.setPowered(true);
 
     await this.#adapter.setDiscoveryFilter({
-      serviceUUIDs: ['cba20d00-224d-11e6-9fb8-0002a5d5c51b'],
-      transport: 'le',
+      serviceUUIDs: [`cba20d00-224d-11e6-9fb8-0002a5d5c51b`],
+      transport: `le`,
     });
 
     const [device] = await this.#adapter.getDevices(this.#deviceAddress);
@@ -102,14 +102,14 @@ export class SwitchBot {
   };
 
   readonly #getServiceData = async (
-    device: Device
+    device: Device,
   ): Promise<readonly number[]> => {
     const serviceData = (await device.getServiceData())?.[
-      '00000d00-0000-1000-8000-00805f9b34fb'
+      `00000d00-0000-1000-8000-00805f9b34fb`
     ];
 
     if (!serviceData) {
-      throw new Error('Service data not found.');
+      throw new Error(`Service data not found.`);
     }
 
     return serviceData;
@@ -117,14 +117,14 @@ export class SwitchBot {
 
   readonly #sendCommand = async (
     device: Device,
-    bytes: readonly number[]
+    bytes: readonly number[],
   ): Promise<void> => {
     await device.connect();
 
     try {
       const writeCharacteristic = await device.waitForGattCharacteristic(
-        'cba20002-224d-11e6-9fb8-0002a5d5c51b',
-        {pollInterval: this.#options.pollInterval}
+        `cba20002-224d-11e6-9fb8-0002a5d5c51b`,
+        {pollInterval: this.#options.pollInterval},
       );
 
       await writeCharacteristic.writeValue(bytes);
