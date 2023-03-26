@@ -18,7 +18,6 @@ npm install @clebert/node-switch-bot @clebert/node-bluez @clebert/node-d-bus
 - Supports reading and writing the `press`/`switch` mode.
 - Supports reading and writing the `on`/`off` switch state.
 - Supports reading the battery level.
-- Tested with Node.js 14 on Raspberry Pi OS Lite.
 
 ## Usage example
 
