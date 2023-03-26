@@ -1,5 +1,5 @@
-import {Adapter} from '@clebert/node-bluez';
 import {SwitchBot} from './lib/index.js';
+import {Adapter} from '@clebert/node-bluez';
 
 await Adapter.use(async (adapter) => {
   const switchBot = new SwitchBot(adapter, `XX:XX:XX:XX:XX:XX`);
